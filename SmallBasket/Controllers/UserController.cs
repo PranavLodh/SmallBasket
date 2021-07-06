@@ -20,16 +20,22 @@ namespace SmallBasket.Controllers
             return View();
         }
 
-        //[HttpPost]
-        //[Route("/User/Login")]
-        //[ValidateAntiForgeryToken]
         [HttpPost]
-        public IActionResult Login( User user)
+        public async Task<IActionResult> Login(User user)
         {
             string TableName = "Users";
-            LowLevelSample.ExecuteAsync().Wait();
-            LowLevelSample.GetOutputFromTable(TableName, new string[] { "id", "password" }, new string[] { user.ID, user.Password }).Wait();
-            return RedirectToAction("Index");
+            string value=await LowLevelSample.GetOutputFromTable(TableName, new string[] { "id", "password" }, new string[] { user.ID, user.Password }, new string[] { "Name" });
+            if (value != "Failed")
+                return RedirectToAction("Output",new { id=value});
+            else 
+                return RedirectToAction("Output", new { id = value });
+        }
+
+        [HttpGet]
+        public IActionResult Output(string id)
+        {
+            ViewBag.Message = id;
+            return View();
         }
     }
 }

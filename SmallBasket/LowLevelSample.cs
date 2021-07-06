@@ -97,7 +97,7 @@ namespace SmallBasket
             }
         }
 
-        public static async Task<string> GetOutputFromTable(string TableName, string[] columns, string[] values)
+        public static async Task<string> GetOutputFromTable(string TableName, string[] columns, string[] values,string[] Output)
         {
             if (columns.Length == values.Length)
             {
@@ -113,10 +113,18 @@ namespace SmallBasket
                     }
                     })).Item;
                     AttributeValue value = null;
-                    //item.TryGetValue("id",out value);
-                    Console.WriteLine(item.TryGetValue("id", out value).ToString());
-                    Console.WriteLine(value.S);
-                    return value.S;
+                    if (item.Count > 0)
+                    {
+                        //item.TryGetValue("id",out value);
+                        for(int i=0;i<Output.Length;i++)                     
+                        item.TryGetValue(Output[i], out value).ToString();
+                        Console.WriteLine(value.S);
+                        return value.S;
+                    }
+                    else
+                    {
+                        return "Failed";
+                    }
                 }
             }
             else
