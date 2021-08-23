@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace SmallBasket.Models
 {
+    [Serializable]
     public class AppSettingsModel
     {
         public string DbConn { get; set; }
