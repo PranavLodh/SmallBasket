@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using SmallBasket.Generic;
 using SmallBasket.Models;
@@ -13,11 +14,12 @@ using System.Threading.Tasks;
 
 namespace SmallBasket.Controllers
 {
+    [Filters]
     public class UserController : Controller
     {
         private readonly IOptions<AppSettingsModel> appSettings;
         private ILog log;
-
+        
         public UserController(IOptions<AppSettingsModel> app)
         {
             appSettings = app;
@@ -28,6 +30,8 @@ namespace SmallBasket.Controllers
             return View();
         }
 
+        
+
         [HttpGet]
         public IActionResult Login()
         {
@@ -35,19 +39,27 @@ namespace SmallBasket.Controllers
             return View();
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet]
-        public IActionResult GetUserDetails(string Username)
+        public IActionResult GetUserDetails(string Username,[FromBody]UserModel Login)
         {
-            LoginUser oUser = new LoginUser();
-            string result;
-            ExecuteData oExecuteData = new ExecuteData();
-            oExecuteData.ExecuteReader(string.Format("Select UserName,ID,ContactNumber from UserLogin where UserName='{0}'",Username), out result);
-            string[] rslt = result.Split(":");
-            oUser.Name = rslt[0];
-            oUser.ID = Convert.ToInt32(rslt[1]);
-            oUser.ContactNumber = Convert.ToInt32(rslt[2]);
-            return Ok(oUser);
+            try
+            {
+                log.LogInformation(Convert.ToString(Request.Body));
+                LoginUser oUser = new LoginUser();
+                string result;
+                ExecuteData oExecuteData = new ExecuteData();
+                oExecuteData.ExecuteReader(string.Format("Select UserName,ID,ContactNumber from UserLogin where UserName='{0}'", Username), out result);
+                string[] rslt = result.Split(":");
+                oUser.Name = rslt[0];
+                oUser.ID = Convert.ToInt32(rslt[1]);
+                oUser.ContactNumber = Convert.ToInt32(rslt[2]);
+                return Ok(oUser);
+            }
+            catch (Exception ex)
+            {
+                throw ex;                
+            }
         }
 
         [HttpGet]

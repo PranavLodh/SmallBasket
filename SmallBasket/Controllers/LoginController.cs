@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Logger;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using SmallBasket.BL;
 using SmallBasket.Generic;
 using SmallBasket.Models;
@@ -18,10 +20,12 @@ namespace SmallBasket.Controllers
     public class LoginController : Controller
     {
         private IConfiguration _config;
+        private ILog log;
 
         public LoginController(IConfiguration config)
         {
             _config = config;
+            log = Log.GetInstance;
         }
 
 
@@ -29,6 +33,7 @@ namespace SmallBasket.Controllers
         [HttpPost]
         public IActionResult Login([FromBody] UserModel login)
         {
+            log.LogInformation("Request Received is " + JsonConvert.SerializeObject(login));
             IActionResult response = Unauthorized();
             var user = LoginBL.AuthenticateUser(login);
 

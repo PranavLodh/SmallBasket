@@ -7,5 +7,6 @@ namespace Logger
     public interface ILog
     {
         void LogException(string message);
+        void LogInformation(string message);
     }
 }

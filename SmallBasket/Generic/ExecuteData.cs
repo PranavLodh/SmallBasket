@@ -22,8 +22,7 @@ namespace SmallBasket.Generic
         public void ExecuteReader(string query, out string result)
         {
             
-                result = string.Empty;
-                throw new Exception("Hello WOrld");
+                result = string.Empty;                
                 result = null;
                 int columns = getColumns(query);
                 using (SqlConnection conn = new SqlConnection(dbConn))
