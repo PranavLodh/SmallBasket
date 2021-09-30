@@ -17,6 +17,7 @@ using static SmallBasket.Controllers.UserController;
 
 namespace SmallBasket.Controllers
 {
+    [Filters]
     public class LoginController : Controller
     {
         private IConfiguration _config;
@@ -36,14 +37,26 @@ namespace SmallBasket.Controllers
             log.LogInformation("Request Received is " + JsonConvert.SerializeObject(login));
             IActionResult response = Unauthorized();
             var user = LoginBL.AuthenticateUser(login);
-
-            if (user != null)
+            LoginResult oLoginResult = new LoginResult();
+            if (user.UserName != null)
             {
-                var tokenString = LoginBL.GenerateJSONWebToken(user,_config);
-                response = Ok(new { token = tokenString });
+                var tokenString = LoginBL.GenerateJSONWebToken(user, _config);
+                oLoginResult.Username = login.UserName;
+                oLoginResult.Status = "Sucess";
+                oLoginResult.Token = tokenString;
+                response = Ok(oLoginResult);
             }
 
             return response;
         }
-    }    
+
+
+    }
+
+    public class LoginResult
+    {
+        public string Token { get; set; }
+        public string Status { get; set; }
+        public string Username { get; set; }
+    }
 }

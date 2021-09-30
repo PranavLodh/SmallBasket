@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using SmallBasket.Controllers;
 using SmallBasket.Generic;
 using SmallBasket.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -16,7 +18,7 @@ namespace SmallBasket.BL
     {
         public static string GenerateJSONWebToken(UserModel userInfo, IConfiguration _config)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] + userInfo.Username));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] + userInfo.UserName));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
@@ -32,14 +34,18 @@ namespace SmallBasket.BL
         {
             ExecuteData oExecuteData = new ExecuteData();
             string result;
-            oExecuteData.ExecuteReader("Select UserName,Password from UserLogin", out result);
-            UserModel user = new UserModel();
-            string[] rslt = result.Split(":");
-            if (Convert.ToString(login.Username) == rslt[0] && Convert.ToString(login.Password) == rslt[1])
+            ArrayList list = new ArrayList();
+            oExecuteData.ExecuteReader("Select UserName,Password from UserLogin", out result,out list);
+            List<UserModel> user = new List<UserModel>();
+            user=JsonConvert.DeserializeObject<List<UserModel>>(result);            
+            for(int i=0;i<user.Count;i++)
             {
-                user.Username = login.Username;
+                if(user[i].UserName!=login.UserName)
+                {
+                    login.UserName = null;
+                }
             }
-            return user;
+            return login;
         }
     }
 }

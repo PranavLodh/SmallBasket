@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using SmallBasket.Generic;
 using SmallBasket.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -47,14 +49,13 @@ namespace SmallBasket.Controllers
             {
                 log.LogInformation(Convert.ToString(Request.Body));
                 LoginUser oUser = new LoginUser();
+                List<LoginUser> oLoginUser = new List<LoginUser>();
                 string result;
+                ArrayList fruits = new ArrayList();
                 ExecuteData oExecuteData = new ExecuteData();
-                oExecuteData.ExecuteReader(string.Format("Select UserName,ID,ContactNumber from UserLogin where UserName='{0}'", Username), out result);
-                string[] rslt = result.Split(":");
-                oUser.Name = rslt[0];
-                oUser.ID = Convert.ToInt32(rslt[1]);
-                oUser.ContactNumber = Convert.ToInt32(rslt[2]);
-                return Ok(oUser);
+                oExecuteData.ExecuteReader(string.Format("Select UserName,ID,ContactNumber from UserLogin where UserName='{0}'", Username), out result,out fruits);
+                oLoginUser = JsonConvert.DeserializeObject<List<LoginUser>>(result);
+                return Ok(oLoginUser[0]);
             }
             catch (Exception ex)
             {
